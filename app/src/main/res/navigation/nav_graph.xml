@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/loginFragment">
+
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.example.sereneread.presentation.auth.LoginFragment"
+        android:label="LoginFragment"
+        tools:layout="@layout/fragment_login">
+
+        <action
+            android:id="@+id/action_loginFragment_to_homeFragment"
+            destination="@id/homeFragment"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="true" />
+
+        <action
+            android:id="@+id/action_loginFragment_to_registerFragment"
+            destination="@id/registerFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/registerFragment"
+        android:name="com.example.sereneread.presentation.auth.RegisterFragment"
+        android:label="RegisterFragment"
+        tools:layout="@layout/fragment_register" />
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.sereneread.presentation.home.HomeFragment"
+        android:label="HomeFragment"
+        tools:layout="@layout/fragment_home">
+
+        <action
+            android:id="@+id/action_homeFragment_to_addBookBottomSheet"
+            destination="@id/addBookBottomSheet" />
+
+        <action
+            android:id="@+id/action_homeFragment_to_detailFragment"
+            destination="@id/detailFragment" />
+    </fragment>
+
+    <dialog
+        android:id="@+id/addBookBottomSheet"
+        android:name="com.example.sereneread.presentation.addbook.AddBookBottomSheet"
+        android:label="AddBookBottomSheet"
+        tools:layout="@layout/bottom_sheet_add_book" />
+
+    <fragment
+        android:id="@+id/detailFragment"
+        android:name="com.example.sereneread.presentation.detail.DetailFragment"
+        android:label="DetailFragment"
+        tools:layout="@layout/fragment_detail">
+
+        <argument
+            android:name="bookId"
+            app:argType="long"
+            android:defaultValue="0L" />
+
+        <action
+            android:id="@+id/action_detailFragment_to_readerFragment"
+            destination="@id/readerFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/readerFragment"
+        android:name="com.example.sereneread.presentation.reader.ReaderFragment"
+        android:label="ReaderFragment"
+        tools:layout="@layout/fragment_reader">
+
+        <argument
+            android:name="bookId"
+            app:argType="long"
+            android:defaultValue="0L" />
+
+    </fragment>
+
+</navigation>
