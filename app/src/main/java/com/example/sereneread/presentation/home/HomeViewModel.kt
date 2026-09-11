@@ -32,7 +32,7 @@ class HomeViewModel @Inject constructor(
     private var allBooksCache: List<Book> = emptyList()
 
     init {
-        seedDummyData()
+        // seedDummyData()
         getBooks()
     }
 

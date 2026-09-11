@@ -8,29 +8,35 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
-import androidx.pdf.viewer.fragment.PdfViewerFragment // Import Library Baru
+import androidx.pdf.viewer.fragment.PdfViewerFragment
 import com.example.sereneread.R
 import com.example.sereneread.databinding.FragmentReaderBinding
+import com.example.sereneread.domain.util.Resource
+import com.example.sereneread.domain.util.Constants
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import java.io.File
-import java.net.URL
+import javax.inject.Inject
 
 @AndroidEntryPoint
-class ReaderFragment : Fragment() { // Hapus implementasi OnPageChangeListener
+class ReaderFragment : Fragment() {
 
     private var _binding: FragmentReaderBinding? = null
     private val binding get() = _binding!!
 
-    private val args: ReaderFragmentArgs by navArgs()
-    private var isControlsVisible = false
+    private val viewModel: ReaderViewModel by viewModels()
 
-    // Variabel untuk menampung PDF Viewer dari AndroidX
+    // Suntikkan OkHttpClient yang sudah terpasang AuthInterceptor
+    @Inject
+    lateinit var okHttpClient: OkHttpClient
+
     private var pdfViewerFragment: PdfViewerFragment? = null
 
     override fun onCreateView(
@@ -46,28 +52,47 @@ class ReaderFragment : Fragment() { // Hapus implementasi OnPageChangeListener
 
         setupUI()
 
-        // Kaitkan variabel dengan fragment yang ada di XML
         pdfViewerFragment = childFragmentManager.findFragmentById(R.id.pdfFragmentContainer) as PdfViewerFragment?
 
-        // HACK: Download PDF dummy
-        val dummyPdfUrl = "https://pdfobject.com/pdf/sample.pdf"
-        downloadAndLoadPdf(dummyPdfUrl)
+        // 1. Ambil bookId dari Bundle (Bypass Safe Args)
+        val bookId = arguments?.getLong("bookId") ?: 0L
+        if (bookId != 0L) {
+            viewModel.getBookContentUrl(bookId)
+        } else {
+            Toast.makeText(requireContext(), "Buku tidak ditemukan", Toast.LENGTH_SHORT).show()
+            findNavController().navigateUp()
+        }
+
+        setupObservers()
+    }
+
+    private fun setupObservers() {
+        viewModel.pdfUrlState.observe(viewLifecycleOwner) { result ->
+            when (result) {
+                is Resource.Loading -> {
+                    binding.progressBar.isVisible = true
+                }
+                is Resource.Success -> {
+                    val rawUrl = result.data ?: ""
+                    if (rawUrl.isNotEmpty()) {
+                        // Gabungkan dengan SERVER_URL jika url dari backend bersifat relatif
+                        val fullUrl = if (rawUrl.startsWith("http")) rawUrl else "${Constants.SERVER_URL}$rawUrl"
+                        downloadAndLoadPdf(fullUrl)
+                    }
+                }
+                is Resource.Error -> {
+                    binding.progressBar.isVisible = false
+                    Toast.makeText(requireContext(), result.message, Toast.LENGTH_LONG).show()
+                }
+            }
+        }
     }
 
     private fun setupUI() {
         binding.btnClose.setOnClickListener {
             findNavController().navigateUp()
         }
-
-        // Sembunyikan footer untuk sementara karena library AndroidX saat ini
-        // belum mengekspos API untuk membaca nomor halaman secara langsung.
         binding.bottomControls.isVisible = false
-    }
-
-    private fun toggleControls() {
-        isControlsVisible = !isControlsVisible
-        binding.topControls.isVisible = isControlsVisible
-        // binding.bottomControls.isVisible = isControlsVisible
     }
 
     private fun downloadAndLoadPdf(urlString: String) {
@@ -75,8 +100,17 @@ class ReaderFragment : Fragment() { // Hapus implementasi OnPageChangeListener
 
         lifecycleScope.launch(Dispatchers.IO) {
             try {
+                // 2. Gunakan OkHttpClient untuk mengunduh agar Token JWT otomatis terkirim
+                val request = Request.Builder().url(urlString).build()
+                val response = okHttpClient.newCall(request).execute()
+
+                if (!response.isSuccessful) {
+                    throw Exception("Gagal mengunduh, kode: ${response.code}")
+                }
+
                 val file = File(requireContext().cacheDir, "temp_book.pdf")
-                URL(urlString).openStream().use { input ->
+                
+                response.body?.byteStream()?.use { input ->
                     file.outputStream().use { output ->
                         input.copyTo(output)
                     }
@@ -89,20 +123,16 @@ class ReaderFragment : Fragment() { // Hapus implementasi OnPageChangeListener
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     binding.progressBar.isVisible = false
-                    Toast.makeText(context, "Gagal memuat buku: ${e.message}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, "Gagal memuat PDF: ${e.message}", Toast.LENGTH_LONG).show()
                 }
             }
         }
     }
 
     private fun displayPdf(file: File) {
-        // Konversi File lokal menjadi URI
         val uri = Uri.fromFile(file)
-
-        // Serahkan URI ke PdfViewerFragment bawaan AndroidX
         pdfViewerFragment?.documentUri = uri
-
-        binding.tvBookTitle.text = "Sample Book"
+        binding.tvBookTitle.text = "Membaca Buku"
     }
 
     override fun onDestroyView() {
