@@ -17,4 +17,6 @@ interface BookRepository {
     suspend fun deleteBook(book: Book)
 
     suspend fun updateBookProgress(book: Book)
+    
+    fun uploadBook(title: String, author: String, publishedYear: Int, pdfFile: java.io.File): kotlinx.coroutines.flow.Flow<Resource<Unit>>
 }

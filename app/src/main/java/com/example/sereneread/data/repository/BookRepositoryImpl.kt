@@ -101,6 +101,38 @@ class BookRepositoryImpl @Inject constructor(
             }
         }
     }
+    
+    override fun uploadBook(
+        title: String,
+        author: String,
+        publishedYear: Int,
+        pdfFile: java.io.File
+    ): Flow<Resource<Unit>> = flow {
+        emit(Resource.Loading())
+        try {
+            // 1. Bungkus teks biasa menjadi RequestBody
+            val titleBody = okhttp3.RequestBody.create(okhttp3.MultipartBody.FORM, title)
+            val authorBody = okhttp3.RequestBody.create(okhttp3.MultipartBody.FORM, author)
+            val yearBody = okhttp3.RequestBody.create(okhttp3.MultipartBody.FORM, publishedYear.toString())
+
+            // 2. Bungkus File fisik menjadi RequestBody berformat PDF
+            val requestFile = okhttp3.RequestBody.create(okhttp3.MediaType.parse("application/pdf"), pdfFile)
+            
+            // 3. Masukkan RequestBody File ke dalam Multipart (nama part harus "pdf_file" sesuai Golang Anda)
+            val pdfPart = okhttp3.MultipartBody.Part.createFormData("pdf_file", pdfFile.name, requestFile)
+
+            // 4. Tembak ke API
+            val response = api.uploadBook(titleBody, authorBody, yearBody, pdfPart)
+
+            if (response.status) {
+                emit(Resource.Success(Unit))
+            } else {
+                emit(Resource.Error(response.message ?: "Gagal mengunggah buku"))
+            }
+        } catch (e: Exception) {
+            emit(Resource.Error("Terjadi kesalahan jaringan: ${e.message}"))
+        }
+    }
 
     override suspend fun getBookById(id: Long): Book? {
         return dao.getBookById(id)?.toDomain()

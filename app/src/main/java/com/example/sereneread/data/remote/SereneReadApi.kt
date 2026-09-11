@@ -2,8 +2,10 @@ package com.example.sereneread.data.remote
 
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Multipart
 import retrofit2.http.PATCH
 import retrofit2.http.POST
+import retrofit2.http.Part
 import retrofit2.http.Path
 
 interface SereneReadApi {
@@ -37,6 +39,15 @@ interface SereneReadApi {
         @Path("booksId") bookId: Long
     ): BaseResponse<BookDto>
     // Kita bisa memakai BookDto karena di dalamnya sudah ada wadah untuk "pdf_url"
+    
+    @Multipart
+    @POST("books")
+    suspend fun uploadBook(
+        @Part("title") title: okhttp3.RequestBody,
+        @Part("author") author: okhttp3.RequestBody,
+        @Part("published_year") publishedYear: okhttp3.RequestBody,
+        @Part pdfFile: okhttp3.MultipartBody.Part
+    ): BaseResponse<Any>
 
 
 }
