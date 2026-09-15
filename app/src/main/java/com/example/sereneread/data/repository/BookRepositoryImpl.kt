@@ -4,6 +4,7 @@ import com.example.sereneread.data.local.dao.BookDao
 import com.example.sereneread.data.mapper.toDomain
 import com.example.sereneread.data.mapper.toEntity
 import com.example.sereneread.data.remote.SereneReadApi
+import com.example.sereneread.data.remote.dto.ProgressRequest
 import com.example.sereneread.domain.model.Book
 import com.example.sereneread.domain.model.BookFormat
 import com.example.sereneread.domain.repository.BookRepository
@@ -13,6 +14,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import javax.inject.Inject
 
 // Suntikkan BookDao DAN SereneReadApi sekaligus
@@ -116,7 +118,7 @@ class BookRepositoryImpl @Inject constructor(
             val yearBody = okhttp3.RequestBody.create(okhttp3.MultipartBody.FORM, publishedYear.toString())
 
             // 2. Bungkus File fisik menjadi RequestBody berformat PDF
-            val requestFile = okhttp3.RequestBody.create(okhttp3.MediaType.parse("application/pdf"), pdfFile)
+            val requestFile = okhttp3.RequestBody.create("application/pdf".toMediaTypeOrNull(), pdfFile)
             
             // 3. Masukkan RequestBody File ke dalam Multipart (nama part harus "pdf_file" sesuai Golang Anda)
             val pdfPart = okhttp3.MultipartBody.Part.createFormData("pdf_file", pdfFile.name, requestFile)
@@ -131,6 +133,19 @@ class BookRepositoryImpl @Inject constructor(
             }
         } catch (e: Exception) {
             emit(Resource.Error("Terjadi kesalahan jaringan: ${e.message}"))
+        }
+    }
+    
+    override fun saveReadingProgress(bookId: Long, lastReadPage: Int): Flow<Resource<Unit>> = flow {
+        try {
+            val response = api.updateReadingProgress(bookId, ProgressRequest(lastReadPage))
+            if (response.status) {
+                emit(Resource.Success(Unit))
+            } else {
+                emit(Resource.Error(response.message ?: "Gagal menyimpan progres"))
+            }
+        } catch (e: Exception) {
+            emit(Resource.Error("Kesalahan jaringan: ${e.message}"))
         }
     }
 

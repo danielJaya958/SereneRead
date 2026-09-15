@@ -8,12 +8,15 @@ import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.NavOptions
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.sereneread.databinding.FragmentHomeBinding
 import com.example.sereneread.domain.model.Book
 import dagger.hilt.android.AndroidEntryPoint
 // Pastikan import ini ada
 import androidx.navigation.fragment.findNavController
+import com.example.sereneread.data.remote.network.TokenManager
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
@@ -23,6 +26,9 @@ class HomeFragment : Fragment() {
 
     private val viewModel: HomeViewModel by viewModels()
     private lateinit var bookAdapter: BookAdapter
+
+    @Inject
+    lateinit var tokenManager: TokenManager
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -39,6 +45,7 @@ class HomeFragment : Fragment() {
         setupRecyclerView()
         setupObservers()
         setupUIInteractions()
+        setupLogoutButton()
     }
 
     private fun setupRecyclerView() {
@@ -93,5 +100,23 @@ class HomeFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+    
+    private fun setupLogoutButton() {
+        binding.btnLogout.setOnClickListener {
+            // 2. Hapus token dari penyimpanan
+            tokenManager.clearToken()
+
+            // 3. Pindah ke Login dan hancurkan riwayat halaman Home
+            val navOptions = NavOptions.Builder()
+                .setPopUpTo(com.example.sereneread.R.id.homeFragment, true)
+                .build()
+                
+            findNavController().navigate(
+                com.example.sereneread.R.id.loginFragment, 
+                null, 
+                navOptions
+            )
+        }
     }
 }

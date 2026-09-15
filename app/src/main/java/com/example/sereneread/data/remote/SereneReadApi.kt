@@ -1,5 +1,6 @@
 package com.example.sereneread.data.remote
 
+import com.example.sereneread.data.remote.dto.ProgressRequest
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Multipart
@@ -48,6 +49,12 @@ interface SereneReadApi {
         @Part("published_year") publishedYear: okhttp3.RequestBody,
         @Part pdfFile: okhttp3.MultipartBody.Part
     ): BaseResponse<Any>
-
+    
+    
+    @PATCH("books/{id}/progress")
+    suspend fun updateReadingProgress(
+        @Path("id") bookId: Long,
+        @Body request: ProgressRequest
+    ): BaseResponse<Any>
 
 }

@@ -90,8 +90,21 @@ class ReaderFragment : Fragment() {
 
     private fun setupUI() {
         binding.btnClose.setOnClickListener {
+            // 1. Ambil ID buku saat ini
+            val currentBookId = arguments?.getLong("bookId") ?: 0L
+            
+            if (currentBookId != 0L) {
+                // 2. TODO: Ganti angka 10 ini dengan variabel halaman asli dari PDF Viewer nanti
+                val currentPage = 10 
+                
+                // 3. Simpan ke Golang!
+                viewModel.saveProgress(currentBookId, currentPage)
+            }
+            
+            // 4. Keluar dari halaman baca
             findNavController().navigateUp()
         }
+        
         binding.bottomControls.isVisible = false
     }
 
@@ -133,6 +146,17 @@ class ReaderFragment : Fragment() {
         val uri = Uri.fromFile(file)
         pdfViewerFragment?.documentUri = uri
         binding.tvBookTitle.text = "Membaca Buku"
+    }
+
+    override fun onPause() {
+        super.onPause()
+        
+        // Simpan progres saat layar mulai ditinggalkan atau disembunyikan
+        val currentBookId = arguments?.getLong("bookId") ?: 0L
+        if (currentBookId != 0L) {
+            val currentPage = 10 // TODO: Ganti dengan halaman asli nanti
+            viewModel.saveProgress(currentBookId, currentPage)
+        }
     }
 
     override fun onDestroyView() {

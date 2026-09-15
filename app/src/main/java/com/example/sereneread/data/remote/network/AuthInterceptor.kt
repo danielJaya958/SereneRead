@@ -19,6 +19,13 @@ class AuthInterceptor @Inject constructor(
             requestBuilder.addHeader("Authorization", "Bearer $token")
         }
 
-        return chain.proceed(requestBuilder.build())
+        val response = chain.proceed(requestBuilder.build())    
+
+        // DETEKSI TOKEN HABIS: Jika server menolak (401), picu alarm!
+        if (response.code == 401) {
+            tokenManager.triggerSessionExpired()
+        }
+
+        return response
     }
 }

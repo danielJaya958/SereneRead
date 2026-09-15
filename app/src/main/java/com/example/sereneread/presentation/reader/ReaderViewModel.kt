@@ -5,14 +5,17 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sereneread.data.remote.SereneReadApi
+import com.example.sereneread.domain.repository.BookRepository
 import com.example.sereneread.domain.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class ReaderViewModel @Inject constructor(
-    private val api: SereneReadApi
+    private val api: SereneReadApi, private val repository: BookRepository
 ) : ViewModel() {
 
     private val _pdfUrlState = MutableLiveData<Resource<String>>()
@@ -32,6 +35,17 @@ class ReaderViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 _pdfUrlState.value = Resource.Error("Kesalahan jaringan: ${e.message}")
+            }
+        }
+    }
+    
+    fun saveProgress(bookId: Long, page: Int) {
+        // Menggunakan scope independen agar proses tetap berjalan meski layar ditutup
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                repository.saveReadingProgress(bookId, page).collect {}
+            } catch (e: Exception) {
+                // Biarkan senyap
             }
         }
     }
