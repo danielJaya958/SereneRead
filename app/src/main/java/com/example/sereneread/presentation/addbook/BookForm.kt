@@ -15,29 +15,48 @@ fun ViewBookFormBinding.fill(title: String, author: String?, year: Int?) {
     etYear.setText(year?.takeIf { it > 0 }?.toString().orEmpty())
 }
 
+// Hasil validasi: input terisi jika valid, selain itu pesan error per kolom
+data class BookFormValidation(
+    val input: BookFormInput?,
+    val titleError: String? = null,
+    val yearError: String? = null
+)
+
 // Validasi sama dengan backend (judul wajib, tahun 1000..tahun ini) supaya pengguna
-// langsung tahu kesalahannya tanpa menunggu respons server. null = ada kolom yang salah.
+// langsung tahu kesalahannya tanpa menunggu respons server. Fungsi murni, mudah dites.
+fun validateBookForm(
+    titleText: String,
+    authorText: String,
+    yearText: String,
+    currentYear: Int = Calendar.getInstance().get(Calendar.YEAR)
+): BookFormValidation {
+    val title = titleText.trim()
+    val author = authorText.trim().ifEmpty { null }
+    val yearTrimmed = yearText.trim()
+    val year = yearTrimmed.toIntOrNull()
+
+    val titleError = if (title.isEmpty()) "Enter a title" else null
+    val yearError = if (yearTrimmed.isNotEmpty() && (year == null || year !in MIN_PUBLISHED_YEAR..currentYear)) {
+        "Use a year between $MIN_PUBLISHED_YEAR and $currentYear"
+    } else {
+        null
+    }
+
+    val input = if (titleError == null && yearError == null) BookFormInput(title, author, year) else null
+    return BookFormValidation(input, titleError, yearError)
+}
+
+// Baca form dan tampilkan error di kolomnya. null = ada kolom yang salah.
 fun ViewBookFormBinding.readValidated(): BookFormInput? {
-    tilTitle.error = null
-    tilYear.error = null
     showFormError(null)
-
-    val title = etTitle.text?.toString()?.trim().orEmpty()
-    val author = etAuthor.text?.toString()?.trim()?.ifEmpty { null }
-    val yearText = etYear.text?.toString()?.trim().orEmpty()
-    val currentYear = Calendar.getInstance().get(Calendar.YEAR)
-    val year = yearText.toIntOrNull()
-
-    var valid = true
-    if (title.isEmpty()) {
-        tilTitle.error = "Enter a title"
-        valid = false
-    }
-    if (yearText.isNotEmpty() && (year == null || year !in MIN_PUBLISHED_YEAR..currentYear)) {
-        tilYear.error = "Use a year between $MIN_PUBLISHED_YEAR and $currentYear"
-        valid = false
-    }
-    return if (valid) BookFormInput(title, author, year) else null
+    val result = validateBookForm(
+        titleText = etTitle.text?.toString().orEmpty(),
+        authorText = etAuthor.text?.toString().orEmpty(),
+        yearText = etYear.text?.toString().orEmpty()
+    )
+    tilTitle.error = result.titleError
+    tilYear.error = result.yearError
+    return result.input
 }
 
 fun ViewBookFormBinding.showFormError(message: String?) {
@@ -50,3 +69,10 @@ fun ViewBookFormBinding.setEnabled(enabled: Boolean) {
     tilAuthor.isEnabled = enabled
     tilYear.isEnabled = enabled
 }
+
+// Judul usulan dari nama file: "_OceanofPDF.com_Saha_Mansion.pdf" -> "OceanofPDF.com Saha Mansion"
+fun suggestTitleFromFileName(fileName: String): String =
+    fileName.replace(Regex("\\.pdf$", RegexOption.IGNORE_CASE), "")
+        .replace('_', ' ')
+        .replace(Regex("\\s+"), " ")
+        .trim()

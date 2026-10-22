@@ -263,29 +263,12 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun applyFilter(filter: BookFilter) {
-        val filteredList = when (filter) {
-            BookFilter.ALL -> allBooksCache
-            BookFilter.IN_PROGRESS -> allBooksCache.filter { it.isInProgress }
-            BookFilter.FINISHED -> allBooksCache.filter { it.isFinished }
-            BookFilter.FAVORITES -> allBooksCache.filter { it.isFavorite }
-            BookFilter.NOT_STARTED -> allBooksCache.filter { !it.isStarted }
-        }
-
-        // Cocokkan judul (yang sudah dirapikan) atau penulis, tanpa membedakan huruf besar/kecil
-        val searched = if (searchQuery.isEmpty()) filteredList else filteredList.filter {
-            it.displayTitle().contains(searchQuery, ignoreCase = true) ||
-                it.author.contains(searchQuery, ignoreCase = true)
-        }
-
-        _books.value = when (_sortOrder.value ?: SortOrder.RECENTLY_ADDED) {
-            // id dari server bertambah setiap upload, jadi id terbesar = paling baru (setara created_at)
-            SortOrder.RECENTLY_ADDED -> searched.sortedByDescending { it.id }
-            SortOrder.TITLE -> searched.sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.displayTitle() })
-            // Buku yang belum pernah dibuka di perangkat ini (lastReadAt = 0) di akhir, urut terbaru
-            SortOrder.RECENTLY_READ -> searched.sortedWith(
-                compareByDescending<Book> { it.lastReadAt }.thenByDescending { it.id }
-            )
-        }
+        _books.value = filterAndSortBooks(
+            books = allBooksCache,
+            filter = filter,
+            query = searchQuery,
+            sort = _sortOrder.value ?: SortOrder.RECENTLY_ADDED
+        )
     }
 }
 

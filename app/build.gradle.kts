@@ -49,6 +49,13 @@ android {
     buildFeatures {
         viewBinding = true
     }
+
+    // Robolectric butuh resource Android saat unit test (dipakai test Room)
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
 }
 
 dependencies {
@@ -100,6 +107,9 @@ dependencies {
     implementation(libs.okhttp.logging)
 
     testImplementation(libs.junit)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.androidx.test.core)
+    testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }

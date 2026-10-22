@@ -60,7 +60,7 @@ class AddBookViewModel @Inject constructor(
         viewModelScope.launch {
             val fileName = withContext(Dispatchers.IO) { getFileName(uri) } ?: "Untitled.pdf"
             lastFileName = fileName
-            _uiState.value = AddBookUiState.Details(fileName, BookFormInput(suggestTitle(fileName), null, null))
+            _uiState.value = AddBookUiState.Details(fileName, BookFormInput(suggestTitleFromFileName(fileName), null, null))
         }
     }
 
@@ -103,20 +103,13 @@ class AddBookViewModel @Inject constructor(
 
     // Kembali ke form dengan isian terakhir (misal setelah server menolak judul)
     fun editDetails() {
-        val form = lastInput ?: BookFormInput(suggestTitle(lastFileName), null, null)
+        val form = lastInput ?: BookFormInput(suggestTitleFromFileName(lastFileName), null, null)
         _uiState.value = AddBookUiState.Details(lastFileName, form)
     }
 
     fun reset() {
         _uiState.value = AddBookUiState.Idle
     }
-
-    // "_OceanofPDF.com_Saha_Mansion.pdf" -> "OceanofPDF.com Saha Mansion"
-    private fun suggestTitle(fileName: String): String =
-        fileName.replace(Regex("\\.pdf$", RegexOption.IGNORE_CASE), "")
-            .replace('_', ' ')
-            .replace(Regex("\\s+"), " ")
-            .trim()
 
     private fun copyToCache(uri: Uri): File {
         val tempFile = File(context.cacheDir, "upload_temp.pdf")

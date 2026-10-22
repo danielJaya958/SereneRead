@@ -34,8 +34,12 @@ retrofit = "2.11.0"
 okhttp = "4.12.0"
 
 # WorkManager (Sinkronisasi progres baca di background)
-work = "2.10.0"
+work = "2.12.0"
 swiperefresh = "1.1.0"
+
+# Testing (unit test JVM + Robolectric untuk Room)
+robolectric = "4.14.1"
+androidxTestCore = "1.6.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -47,6 +51,9 @@ androidx-constraintlayout = { group = "androidx.constraintlayout", name = "const
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
+androidx-test-core = { group = "androidx.test", name = "core-ktx", version.ref = "androidxTestCore" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines" }
 
 # Navigation
 androidx-navigation-fragment-ktx = { group = "androidx.navigation", name = "navigation-fragment-ktx", version.ref = "navigation" }
