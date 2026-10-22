@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Sampul buku. Jika tidak ada gambar, tampilkan sampul tipografi (judul di atas warna polos)
+     supaya rak tetap terlihat seperti rak buku, bukan deretan ikon placeholder. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/tvCoverTitle"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/cover_tone_1"
+        android:ellipsize="end"
+        android:fontFamily="serif"
+        android:gravity="bottom|start"
+        android:importantForAccessibility="no"
+        android:lineSpacingMultiplier="1.1"
+        android:maxLines="5"
+        android:padding="10dp"
+        android:textColor="@color/cream_white"
+        android:textSize="13sp"
+        tools:text="Saha Mansion" />
+
+    <ImageView
+        android:id="@+id/ivCover"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:importantForAccessibility="no"
+        android:scaleType="centerCrop" />
+</FrameLayout>

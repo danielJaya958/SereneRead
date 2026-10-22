@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Chip filter di Home: terisi teal saat aktif, garis tipis saat tidak -->
+    <style name="Widget.SereneRead.Chip.Filter" parent="Widget.Material3.Chip.Filter">
+        <item name="chipBackgroundColor">@color/chip_filter_bg</item>
+        <item name="chipStrokeColor">@color/chip_filter_stroke</item>
+        <item name="chipStrokeWidth">1dp</item>
+        <item name="android:textColor">@color/chip_filter_text</item>
+        <item name="checkedIconVisible">false</item>
+        <item name="chipCornerRadius">18dp</item>
+        <item name="android:textSize">14sp</item>
+        <item name="rippleColor">@color/hairline</item>
+    </style>
+
+    <!-- Kolom isian form buku -->
+    <style name="Widget.SereneRead.TextInput" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">@color/deep_teal</item>
+        <item name="hintTextColor">@color/deep_teal</item>
+        <item name="boxCornerRadiusTopStart">10dp</item>
+        <item name="boxCornerRadiusTopEnd">10dp</item>
+        <item name="boxCornerRadiusBottomStart">10dp</item>
+        <item name="boxCornerRadiusBottomEnd">10dp</item>
+    </style>
+
+    <!-- Kolom cari di Home: lebih ringkas dari form, sudut membulat penuh -->
+    <style name="Widget.SereneRead.SearchField" parent="Widget.Material3.TextInputLayout.OutlinedBox.Dense">
+        <item name="boxStrokeColor">@color/deep_teal</item>
+        <item name="boxBackgroundColor">@color/pure_white</item>
+        <item name="boxStrokeWidth">1dp</item>
+        <item name="boxCornerRadiusTopStart">24dp</item>
+        <item name="boxCornerRadiusTopEnd">24dp</item>
+        <item name="boxCornerRadiusBottomStart">24dp</item>
+        <item name="boxCornerRadiusBottomEnd">24dp</item>
+        <item name="hintEnabled">false</item>
+    </style>
+</resources>
