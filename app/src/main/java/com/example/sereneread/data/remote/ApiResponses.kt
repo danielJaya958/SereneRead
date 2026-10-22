@@ -22,16 +22,15 @@ data class BookDto(
     @SerializedName("published_year") val publishedYear: Int,
     @SerializedName("thumbnail_url") val thumbnailUrl: String?, // Bisa null
     @SerializedName("pdf_url") val pdfUrl: String?,             // Bisa null (saat get list)
-    @SerializedName("last_read_page") val lastReadPage: Int?    // Bisa null
+    @SerializedName("last_read_page") val lastReadPage: Int?,   // Bisa null
+    @SerializedName("total_pages") val totalPages: Int? = null, // Bisa null (endpoint lama)
+    @SerializedName("is_favorite") val isFavorite: Boolean? = null,
+    // Waktu selesai dibaca (ISO-8601, misal "2026-10-22T13:50:05.17599+08:00"), null = belum selesai
+    @SerializedName("finished_at") val finishedAt: String? = null
 )
 
 // 4. DTO untuk Login Request
 data class LoginRequest(
     @SerializedName("email") val email: String,
     @SerializedName("password") val password: String
-)
-
-// 5. DTO untuk Update Progress Request
-data class UpdateProgressRequest(
-    @SerializedName("last_read_page") val lastReadPage: Int
 )

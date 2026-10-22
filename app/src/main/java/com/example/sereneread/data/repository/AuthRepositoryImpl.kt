@@ -3,6 +3,7 @@ package com.example.sereneread.data.repository
 import com.example.sereneread.data.remote.LoginRequest
 import com.example.sereneread.data.remote.SereneReadApi
 import com.example.sereneread.data.remote.network.TokenManager
+import com.example.sereneread.data.session.SessionCleaner
 import com.example.sereneread.domain.repository.AuthRepository
 import com.example.sereneread.domain.util.Resource
 import kotlinx.coroutines.flow.Flow
@@ -11,7 +12,8 @@ import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
     private val api: SereneReadApi,
-    private val tokenManager: TokenManager
+    private val tokenManager: TokenManager,
+    private val sessionCleaner: SessionCleaner
 ) : AuthRepository {
 
     override fun login(email: String, password: String): Flow<Resource<Unit>> = flow {
@@ -24,6 +26,8 @@ class AuthRepositoryImpl @Inject constructor(
 
             // Cek status dari response JSON Golang Anda
             if (response.status && response.data != null) {
+                // Akun berbeda dari sebelumnya: bersihkan data lokal akun lama
+                sessionCleaner.onLoginSuccess(email)
                 // Simpan token ke SharedPreferences
                 tokenManager.saveToken(response.data.token)
                 emit(Resource.Success(Unit))

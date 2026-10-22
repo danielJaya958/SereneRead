@@ -18,7 +18,10 @@ fun BookEntity.toDomain(): Book {
         isFavorite = isFavorite,
         dateAdded = dateAdded,
         lastReadPosition = lastReadPosition,
-        totalPages = totalPages
+        totalPages = totalPages,
+        lastReadAt = lastReadAt,
+        publishedYear = publishedYear,
+        finishedAt = finishedAt
     )
 }
 
@@ -37,6 +40,9 @@ fun Book.toEntity(): BookEntity {
         isFavorite = isFavorite,
         dateAdded = dateAdded,
         lastReadPosition = lastReadPosition,
-        totalPages = totalPages
+        totalPages = totalPages,
+        lastReadAt = lastReadAt,
+        publishedYear = publishedYear,
+        finishedAt = finishedAt
     )
 }

@@ -1,78 +1,95 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="4dp"
-    app:cardBackgroundColor="@color/pure_white"
-    android:clickable="true"
-    android:focusable="true">
+    android:background="?attr/selectableItemBackground"
+    android:orientation="vertical"
+    android:paddingHorizontal="6dp"
+    android:paddingTop="6dp"
+    android:paddingBottom="18dp">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <!-- Bayangan kecil hanya di sampul: sampul adalah benda fisik di rak -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardCover"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="12dp">
+        app:cardCornerRadius="6dp"
+        app:cardElevation="2dp"
+        app:strokeWidth="0dp">
 
-        <ImageView
-            android:id="@+id/ivBookCover"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_book_placeholder"
-            app:layout_constraintDimensionRatio="2:3"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            tools:background="#DDD" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/tvBookTitle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:layout_marginHorizontal="12dp"
-            android:text="The Great Gatsby"
-            android:textColor="@color/charcoal_grey"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:maxLines="2"
-            android:ellipsize="end"
-            app:layout_constraintTop_toBottomOf="@id/ivBookCover"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            <include
+                android:id="@+id/cover"
+                layout="@layout/view_book_cover"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintDimensionRatio="2:3"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/tvBookAuthor"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:layout_marginHorizontal="12dp"
-            android:text="F. Scott Fitzgerald"
-            android:textColor="@color/medium_grey"
-            android:textSize="12sp"
-            android:maxLines="1"
-            android:ellipsize="end"
-            app:layout_constraintTop_toBottomOf="@id/tvBookTitle"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            <!-- Tanda favorit: lingkaran gelap agar tetap terbaca di atas sampul terang -->
+            <ImageView
+                android:id="@+id/ivFavorite"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_margin="6dp"
+                android:background="@drawable/bg_favorite_badge"
+                android:importantForAccessibility="no"
+                android:padding="5dp"
+                android:src="@drawable/ic_favorite"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/soft_gold"
+                tools:visibility="visible" />
 
-        <ProgressBar
-            android:id="@+id/progressBar"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="0dp"
-            android:layout_height="4dp"
-            android:layout_marginTop="8dp"
-            android:progress="45"
-            android:progressTint="@color/deep_teal"
-            app:layout_constraintTop_toBottomOf="@id/tvBookAuthor"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginHorizontal="12dp"/>
+            <!-- Progres baca menempel di tepi bawah sampul, hanya untuk buku yang sudah dibuka -->
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/progressBook"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:max="100"
+                android:visibility="gone"
+                app:indicatorColor="@color/soft_gold"
+                app:layout_constraintBottom_toBottomOf="@id/cover"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:trackColor="#66000000"
+                app:trackCornerRadius="0dp"
+                app:trackThickness="3dp"
+                app:trackStopIndicatorSize="0dp"
+                app:indicatorTrackGapSize="0dp"
+                tools:progress="40"
+                tools:visibility="visible" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    <TextView
+        android:id="@+id/tvBookTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:ellipsize="end"
+        android:maxLines="2"
+        android:textColor="@color/charcoal_grey"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        tools:text="Saha Mansion" />
 
-</com.google.android.material.card.MaterialCardView>
+    <TextView
+        android:id="@+id/tvBookMeta"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/ink_muted"
+        android:textSize="12sp"
+        tools:text="Cho Nam-Joo" />
+</LinearLayout>

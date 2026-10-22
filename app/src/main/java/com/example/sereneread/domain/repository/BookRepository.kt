@@ -18,7 +18,22 @@ interface BookRepository {
 
     suspend fun updateBookProgress(book: Book)
     
-    fun uploadBook(title: String, author: String, publishedYear: Int, pdfFile: java.io.File): kotlinx.coroutines.flow.Flow<Resource<Unit>>
+    // Ambil daftar terbaru dari server ke Room (melempar exception jika gagal)
+    suspend fun refreshBooks()
+
+    // Pantau satu buku dari Room (null jika tidak ada)
+    fun observeBook(id: Long): Flow<Book?>
+
+    // Ubah info buku di server; field null tidak diubah
+    suspend fun updateBookInfo(id: Long, title: String?, author: String?, publishedYear: Int?): Resource<Book>
+
+    // Hapus buku di server dan di perangkat
+    suspend fun removeBook(id: Long): Resource<Unit>
+
+    suspend fun setFavorite(id: Long, isFavorite: Boolean): Resource<Unit>
+
+    fun uploadBook(title: String, author: String, publishedYear: Int, pdfFile: java.io.File): kotlinx.coroutines.flow.Flow<com.example.sereneread.domain.model.UploadStatus>
     
-    fun saveReadingProgress(bookId: Long, lastReadPage: Int): kotlinx.coroutines.flow.Flow<Resource<Unit>>
+    // Simpan lokal lalu antrekan sinkronisasi ke server. lastReadPage dimulai dari 1.
+    suspend fun saveReadingProgress(bookId: Long, lastReadPage: Int, totalPages: Int)
 }

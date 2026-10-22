@@ -5,15 +5,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import coil.load
-import coil.transform.RoundedCornersTransformation
 import com.example.sereneread.R
 import com.example.sereneread.databinding.FragmentDetailBinding
 import com.example.sereneread.domain.model.Book
-import com.example.sereneread.domain.util.Resource
+import com.example.sereneread.presentation.home.bind
+import com.example.sereneread.presentation.home.displayTitle
+import com.example.sereneread.presentation.home.progressLabel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -22,6 +24,7 @@ class DetailFragment : Fragment() {
     private var _binding: FragmentDetailBinding? = null
     private val binding get() = _binding!!
 
+    // bookId dibaca ViewModel dari argumen navigasi (SavedStateHandle)
     private val viewModel: DetailViewModel by viewModels()
 
     override fun onCreateView(
@@ -34,14 +37,10 @@ class DetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 1. Ambil bookId dari Bundle yang dikirim oleh HomeFragment
-        val bookId = arguments?.getLong("bookId") ?: 0L
-
-        if (bookId != 0L) {
-            viewModel.loadBook(bookId)
-        } else {
+        if (viewModel.bookId == 0L) {
             Toast.makeText(requireContext(), "Buku tidak ditemukan", Toast.LENGTH_SHORT).show()
             findNavController().navigateUp()
+            return
         }
 
         setupObservers()
@@ -49,50 +48,83 @@ class DetailFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        viewModel.bookState.observe(viewLifecycleOwner) { result ->
-            when (result) {
-                is Resource.Loading -> {
-                    // Bisa tambahkan animasi loading atau sembunyikan UI sementara
-                    binding.btnRead.text = "Loading..."
-                    binding.btnRead.isEnabled = false
+        viewModel.state.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                DetailState.Loading -> {
+                    binding.progressLoading.isVisible = true
+                    binding.scrollContent.visibility = View.INVISIBLE
                 }
-                is Resource.Success -> {
-                    binding.btnRead.text = "Start Reading"
-                    binding.btnRead.isEnabled = true
-                    result.data?.let { bindBookData(it) }
+                is DetailState.Content -> {
+                    binding.progressLoading.isVisible = false
+                    binding.scrollContent.visibility = View.VISIBLE
+                    bindBookData(state.book)
                 }
-                is Resource.Error -> {
-                    binding.btnRead.text = "Error"
-                    Toast.makeText(requireContext(), result.message, Toast.LENGTH_SHORT).show()
+                is DetailState.Gone -> {
+                    Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
+                    // Cegah navigasi ganda jika state terkirim ulang
+                    if (findNavController().currentDestination?.id == R.id.detailFragment) {
+                        findNavController().navigateUp()
+                    }
                 }
             }
+        }
+
+        viewModel.message.observe(viewLifecycleOwner) { message ->
+            if (message != null) {
+                Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+                viewModel.messageShown()
+            }
+        }
+
+        viewModel.deleting.observe(viewLifecycleOwner) { deleting ->
+            binding.btnDelete.isEnabled = !deleting && viewModel.currentBook != null
+            binding.btnEdit.isEnabled = !deleting && viewModel.currentBook != null
+            binding.btnRead.isEnabled = !deleting
         }
     }
 
     private fun bindBookData(book: Book) {
         binding.apply {
-            tvBookTitle.text = book.title
+            cover.bind(book)
+            tvBookTitle.text = book.displayTitle()
             tvBookAuthor.text = book.author
-            tvDescription.text = book.description
-            tvRating.text = book.rating.toString()
-            tvGenre.text = book.genre
 
-            if (!book.coverUrl.isNullOrEmpty()) {
-                ivBookCover.load(book.coverUrl) {
-                    crossfade(true)
-                    placeholder(R.drawable.ic_book_placeholder)
-                    transformations(RoundedCornersTransformation(0f)) // Sesuaikan radius jika perlu
+            // "2024 · 252 pages", hanya bagian yang diketahui
+            tvBookMeta.text = listOfNotNull(
+                book.publishedYear.takeIf { it > 0 }?.toString(),
+                book.totalPages.takeIf { it > 0 }?.let { if (it == 1) "1 page" else "$it pages" }
+            ).joinToString(" · ")
+            tvBookMeta.isVisible = tvBookMeta.text.isNotEmpty()
+
+            when {
+                book.isFinished -> {
+                    tvReadingStatus.text = "Finished"
+                    progressReading.isVisible = true
+                    progressReading.progress = 100
+                    btnRead.text = "Read again"
+                }
+                book.isStarted -> {
+                    tvReadingStatus.text = book.progressLabel()
+                    progressReading.isVisible = book.totalPages > 0
+                    progressReading.progress = book.progressPercentage
+                    btnRead.text = "Continue reading"
+                }
+                else -> {
+                    tvReadingStatus.text = "Not started yet"
+                    progressReading.isVisible = false
+                    btnRead.text = "Start reading"
                 }
             }
-            updateFavoriteIcon(book.isFavorite)
-        }
-    }
 
-    private fun updateFavoriteIcon(isFavorite: Boolean) {
-        if (isFavorite) {
-            binding.btnFavorite.setIconResource(R.drawable.ic_favorite)
-        } else {
-            binding.btnFavorite.setIconResource(R.drawable.ic_favorite_border)
+            btnFavorite.setIconResource(
+                if (book.isFavorite) R.drawable.ic_favorite else R.drawable.ic_favorite_border
+            )
+            btnFavorite.contentDescription =
+                if (book.isFavorite) "Remove from favorites" else "Add to favorites"
+
+            val deleting = viewModel.deleting.value == true
+            btnEdit.isEnabled = !deleting
+            btnDelete.isEnabled = !deleting
         }
     }
 
@@ -105,21 +137,25 @@ class DetailFragment : Fragment() {
             viewModel.toggleFavorite()
         }
 
-        binding.btnRead.setOnClickListener {
-            val currentBook = viewModel.currentBook
-            if (currentBook != null) {
-                // 1. Kita hapus syarat pengecekan filePath!
-                // Cukup pastikan bukunya ada, lalu kirim ID-nya ke ReaderFragment.
-                val bundle = android.os.Bundle().apply {
-                    putLong("bookId", currentBook.id)
-                }
+        binding.btnEdit.setOnClickListener {
+            val bundle = Bundle().apply { putLong("bookId", viewModel.bookId) }
+            findNavController().navigate(R.id.editBookBottomSheet, bundle)
+        }
 
-                // 2. BYPASS SAFE ARGS: Tembak langsung ke ID layarnya (readerFragment)
-                // agar tidak terjadi crash "Destination id == 0" seperti sebelumnya
-                findNavController().navigate(com.example.sereneread.R.id.readerFragment, bundle)
-            } else {
-                Toast.makeText(requireContext(), "Data buku belum siap", Toast.LENGTH_SHORT).show()
-            }
+        binding.btnDelete.setOnClickListener {
+            val book = viewModel.currentBook ?: return@setOnClickListener
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Delete “${book.displayTitle()}”?")
+                .setMessage("The PDF, your reading progress, and favorite status will be removed. This can't be undone.")
+                .setNegativeButton("Cancel", null)
+                .setPositiveButton("Delete") { _, _ -> viewModel.deleteBook() }
+                .show()
+        }
+
+        binding.btnRead.setOnClickListener {
+            // BYPASS SAFE ARGS: Tembak langsung ke ID layarnya (readerFragment)
+            val bundle = Bundle().apply { putLong("bookId", viewModel.bookId) }
+            findNavController().navigate(R.id.readerFragment, bundle)
         }
     }
 

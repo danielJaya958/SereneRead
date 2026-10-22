@@ -1,6 +1,8 @@
 package com.example.sereneread.core.di
 
 import android.app.Application
+import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
 import androidx.room.Room
 import com.example.sereneread.data.local.SereneDatabase
 import com.example.sereneread.data.local.dao.BookDao
@@ -30,7 +32,9 @@ object AppModule {
             app,
             SereneDatabase::class.java,
             "serene_read_db"
-        ).build()
+        )
+            .addMigrations(SereneDatabase.MIGRATION_1_2, SereneDatabase.MIGRATION_2_3, SereneDatabase.MIGRATION_3_4)
+            .build()
     }
 
     // 2. Sediakan DAO
@@ -46,10 +50,12 @@ object AppModule {
     @Provides
     @Singleton
     fun provideBookRepository(
+        db: SereneDatabase,
         dao: BookDao,
-        api: SereneReadApi // 1. Tambahkan parameter ini agar Hilt menyediakannya
+        api: SereneReadApi, // 1. Tambahkan parameter ini agar Hilt menyediakannya
+        @ApplicationContext context: Context // Dibutuhkan WorkManager untuk sinkronisasi progres
     ): BookRepository {
-        return BookRepositoryImpl(dao, api) // 2. Masukkan ke dalam constructor
+        return BookRepositoryImpl(db, dao, api, context) // 2. Masukkan ke dalam constructor
     }
 
     // 4. Sediakan Use Cases

@@ -25,5 +25,15 @@ data class BookEntity(
 
     // Progress
     val lastReadPosition: Int,
-    val totalPages: Int
+    val totalPages: Int,
+
+    // false = progres lokal belum berhasil dikirim ke server, jangan ditimpa data server
+    val progressSynced: Boolean = true,
+
+    // Waktu (epoch millis) progres terakhir disimpan, untuk kartu "Continue reading" di Home
+    val lastReadAt: Long = 0,
+
+    // v4: tahun terbit (0 = belum diketahui) dan waktu selesai dibaca (null = belum)
+    val publishedYear: Int = 0,
+    val finishedAt: Long? = null
 )

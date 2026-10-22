@@ -10,189 +10,196 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
+        android:background="@color/cream_white"
         app:elevation="0dp">
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize">
+            android:layout_height="56dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="4dp">
 
             <ImageButton
                 android:id="@+id/btnBack"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Back"
                 android:src="@drawable/ic_arrow_back"
-                app:tint="@color/charcoal_grey"
-                android:contentDescription="Back" />
-        </androidx.appcompat.widget.Toolbar>
+                app:tint="@color/charcoal_grey" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <ImageButton
+                android:id="@+id/btnEdit"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Edit book details"
+                android:enabled="false"
+                android:src="@drawable/ic_edit"
+                android:tooltipText="Edit book details"
+                app:tint="@color/charcoal_grey" />
+
+            <ImageButton
+                android:id="@+id/btnDelete"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Delete book"
+                android:enabled="false"
+                android:src="@drawable/ic_delete"
+                android:tooltipText="Delete book"
+                app:tint="@color/charcoal_grey" />
+        </LinearLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollContent"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:visibility="invisible"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:visibility="visible">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="32dp">
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingHorizontal="24dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="40dp">
 
+            <!-- Sampul: satu-satunya elemen dengan bayangan, seperti buku di atas meja -->
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardCover"
-                android:layout_width="160dp"
-                android:layout_height="240dp"
-                android:layout_marginTop="16dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="12dp"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+                android:layout_width="150dp"
+                android:layout_height="225dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="6dp"
+                app:strokeWidth="0dp">
 
-                <ImageView
-                    android:id="@+id/ivBookCover"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/ic_book_placeholder" />
+                <include
+                    android:id="@+id/cover"
+                    layout="@layout/view_book_cover" />
             </com.google.android.material.card.MaterialCardView>
 
             <TextView
                 android:id="@+id/tvBookTitle"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:layout_marginHorizontal="24dp"
-                android:text="The Great Gatsby"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                android:textColor="@color/charcoal_grey"
+                android:fontFamily="serif"
                 android:gravity="center"
-                app:layout_constraintTop_toBottomOf="@id/cardCover"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+                android:textColor="@color/charcoal_grey"
+                android:textSize="24sp"
+                tools:text="Saha Mansion" />
 
             <TextView
                 android:id="@+id/tvBookAuthor"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="F. Scott Fitzgerald"
+                android:layout_marginTop="6dp"
+                android:gravity="center"
+                android:textColor="@color/ink_muted"
                 android:textSize="16sp"
-                android:textColor="@color/medium_grey"
-                app:layout_constraintTop_toBottomOf="@id/tvBookTitle"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+                tools:text="Cho Nam-Joo" />
 
-            <LinearLayout
-                android:id="@+id/metaContainer"
-                android:layout_width="wrap_content"
+            <TextView
+                android:id="@+id/tvBookMeta"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="16dp"
-                android:gravity="center_vertical"
-                app:layout_constraintTop_toBottomOf="@id/tvBookAuthor"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+                android:layout_marginTop="4dp"
+                android:gravity="center"
+                android:textColor="@color/ink_muted"
+                android:textSize="14sp"
+                tools:text="2024 · 252 pages" />
 
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/ic_star"
-                    app:tint="@color/soft_gold"/>
-                <TextView
-                    android:id="@+id/tvRating"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="4.5"
-                    android:textStyle="bold"
-                    android:layout_marginStart="4dp"
-                    android:textColor="@color/charcoal_grey"/>
-
-                <View
-                    android:layout_width="1dp"
-                    android:layout_height="16dp"
-                    android:background="@color/medium_grey"
-                    android:layout_marginHorizontal="16dp"/>
+            <!-- Status baca -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/tvGenre"
+                    android:id="@+id/tvReadingStatus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Classic"
-                    android:background="@drawable/bg_chip_outline"
-                    android:paddingHorizontal="12dp"
-                    android:paddingVertical="4dp"
-                    android:textColor="@color/deep_teal"/>
+                    android:textColor="@color/charcoal_grey"
+                    android:textSize="14sp"
+                    tools:text="Page 5 of 252" />
+
+                <com.google.android.material.progressindicator.LinearProgressIndicator
+                    android:id="@+id/progressReading"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:max="100"
+                    app:indicatorColor="@color/deep_teal"
+                    app:indicatorTrackGapSize="0dp"
+                    app:trackColor="@color/hairline"
+                    app:trackCornerRadius="2dp"
+                    app:trackStopIndicatorSize="0dp"
+                    app:trackThickness="4dp"
+                    tools:progress="20" />
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/actionContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="32dp"
-                android:paddingHorizontal="24dp"
-                app:layout_constraintTop_toBottomOf="@id/metaContainer">
+                android:layout_marginTop="24dp"
+                android:orientation="horizontal">
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnRead"
                     android:layout_width="0dp"
-                    android:layout_height="60dp"
+                    android:layout_height="56dp"
                     android:layout_weight="1"
-                    android:text="Start Reading"
-                    app:cornerRadius="12dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:textColor="@color/white"
                     android:textSize="16sp"
-                    android:backgroundTint="@color/deep_teal"
+                    app:backgroundTint="@color/deep_teal"
+                    app:cornerRadius="12dp"
                     app:icon="@drawable/ic_menu_book"
-                    app:iconGravity="textStart"/>
+                    app:iconGravity="textStart"
+                    app:iconTint="@color/white"
+                    tools:text="Continue reading" />
+
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnFavorite"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:layout_marginStart="16dp"
-                    app:cornerRadius="12dp"
-                    app:icon="@drawable/ic_favorite_border"
-                    app:iconTint="@color/deep_teal"
-                    app:strokeColor="@color/deep_teal"
-                    app:iconGravity="textStart"
-                    android:padding="0dp"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:layout_marginStart="12dp"
+                    android:contentDescription="Add to favorites"
                     android:insetLeft="0dp"
                     android:insetTop="0dp"
                     android:insetRight="0dp"
-                    android:insetBottom="0dp"/>
+                    android:insetBottom="0dp"
+                    android:padding="0dp"
+                    app:cornerRadius="12dp"
+                    app:icon="@drawable/ic_favorite_border"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"
+                    app:iconTint="@color/deep_teal"
+                    app:strokeColor="@color/hairline" />
             </LinearLayout>
-
-            <TextView
-                android:id="@+id/tvDescriptionTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Description"
-                android:textStyle="bold"
-                android:textSize="18sp"
-                android:layout_marginTop="32dp"
-                android:layout_marginStart="24dp"
-                android:textColor="@color/charcoal_grey"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/actionContainer"/>
-
-            <TextView
-                android:id="@+id/tvDescription"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:layout_marginHorizontal="24dp"
-                android:text="Isi sinopsis buku akan muncul di sini..."
-                android:lineSpacingMultiplier="1.5"
-                android:textColor="@color/charcoal_grey"
-                app:layout_constraintTop_toBottomOf="@id/tvDescriptionTitle"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"/>
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
+        </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+
+    <!-- Memuat pertama kali (buku belum ada di perangkat) -->
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        android:id="@+id/progressLoading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:indeterminate="true"
+        app:indicatorColor="@color/deep_teal" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

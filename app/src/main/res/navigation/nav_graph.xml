@@ -49,6 +49,18 @@
         android:label="AddBookBottomSheet"
         tools:layout="@layout/bottom_sheet_add_book" />
 
+    <dialog
+        android:id="@+id/editBookBottomSheet"
+        android:name="com.example.sereneread.presentation.editbook.EditBookBottomSheet"
+        android:label="EditBookBottomSheet"
+        tools:layout="@layout/bottom_sheet_edit_book">
+
+        <argument
+            android:name="bookId"
+            app:argType="long"
+            android:defaultValue="0L" />
+    </dialog>
+
     <fragment
         android:id="@+id/detailFragment"
         android:name="com.example.sereneread.presentation.detail.DetailFragment"

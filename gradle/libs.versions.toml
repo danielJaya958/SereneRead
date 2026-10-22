@@ -33,6 +33,10 @@ ksp = "2.0.21-1.0.25"
 retrofit = "2.11.0"
 okhttp = "4.12.0"
 
+# WorkManager (Sinkronisasi progres baca di background)
+work = "2.10.0"
+swiperefresh = "1.1.0"
+
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
@@ -77,6 +81,10 @@ retrofit-gson = { group = "com.squareup.retrofit2", name = "converter-gson", ver
 # OkHttp (Untuk koneksi dan logging/melihat isi API di Logcat)
 okhttp-core = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
 okhttp-logging = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
+
+# WorkManager
+androidx-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "work" }
+androidx-swiperefreshlayout = { group = "androidx.swiperefreshlayout", name = "swiperefreshlayout", version.ref = "swiperefresh" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

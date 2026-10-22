@@ -2,15 +2,12 @@ package com.example.sereneread.presentation.home
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import coil.load
-import coil.transform.RoundedCornersTransformation
-import com.example.sereneread.R
 import com.example.sereneread.databinding.ItemBookBinding
 import com.example.sereneread.domain.model.Book
-import java.io.File
 
 class BookAdapter(
     private val onBookClick: (Book) -> Unit
@@ -35,25 +32,23 @@ class BookAdapter(
 
         fun bind(book: Book) {
             binding.apply {
-                tvBookTitle.text = book.title
-                tvBookAuthor.text = book.author
+                cover.bind(book)
+                tvBookTitle.text = book.displayTitle()
 
-                // Progress bar
-                progressBar.progress = book.progressPercentage
+                // Baris kedua: status selesai, progres, atau nama penulis jika belum dibaca
+                val status = book.statusLabel()
+                tvBookMeta.text = status ?: book.author
 
-                // REVISI: Load Image dari URL (Online)
-                // Coil otomatis mendeteksi string ini sebagai URL HTTP/HTTPS
-                if (!book.coverUrl.isNullOrEmpty()) {
-                    ivBookCover.load(book.coverUrl) {
-                        crossfade(true)
-                        placeholder(R.drawable.ic_book_placeholder)
-                        error(R.drawable.ic_book_placeholder)
-                        transformations(RoundedCornersTransformation(0f))
-                    }
-                } else {
-                    ivBookCover.setImageResource(R.drawable.ic_book_placeholder)
-                }
+                progressBook.isVisible = book.isStarted && book.totalPages > 0
+                progressBook.progress = if (book.isFinished) 100 else book.progressPercentage
+                ivFavorite.isVisible = book.isFavorite
 
+                root.contentDescription = listOfNotNull(
+                    book.displayTitle(),
+                    book.author,
+                    status,
+                    "favorite".takeIf { book.isFavorite }
+                ).joinToString(", ")
                 root.setOnClickListener {
                     onBookClick(book)
                 }
@@ -74,4 +69,15 @@ class BookAdapter(
             return oldItem == newItem
         }
     }
+}
+
+// Total halaman baru diketahui setelah PDF pernah dibuka di perangkat ini
+fun Book.progressLabel(): String =
+    if (totalPages > 0) "Page $lastReadPosition of $totalPages" else "Page $lastReadPosition"
+
+// "Finished", "Page X of Y", atau null jika belum mulai dibaca
+fun Book.statusLabel(): String? = when {
+    isFinished -> "Finished"
+    isStarted -> progressLabel()
+    else -> null
 }

@@ -4,10 +4,20 @@
     <color name="deep_teal">#005F73</color>
     <color name="deep_teal_dark">#004C5C</color>
     <color name="soft_gold">#E9C46A</color>
-    <color name="cream_white">#F8F9FA</color>
+    <color name="cream_white">#F6F4EF</color>
     <color name="pure_white">#FFFFFF</color>
     <color name="charcoal_grey">#2D3748</color>
     <color name="medium_grey">#718096</color>
     <color name="white">#FFFFFF</color>
     <color name="transparent">#00000000</color>
+
+    <!-- Home: warna pendukung -->
+    <color name="ink_muted">#5A6475</color>
+    <color name="error_red">#B3261E</color>
+    <color name="hairline">#E4E0D8</color>
+    <color name="cover_tone_1">#1D4E5C</color>
+    <color name="cover_tone_2">#2D3748</color>
+    <color name="cover_tone_3">#3D5A50</color>
+    <color name="on_teal_muted">#B3FFFFFF</color>
+    <color name="on_teal_track">#33FFFFFF</color>
 </resources>

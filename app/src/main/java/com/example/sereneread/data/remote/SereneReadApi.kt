@@ -1,6 +1,10 @@
 package com.example.sereneread.data.remote
 
+import com.example.sereneread.data.remote.dto.FavoriteRequest
 import com.example.sereneread.data.remote.dto.ProgressRequest
+import com.example.sereneread.data.remote.dto.UpdateBookRequest
+import retrofit2.http.DELETE
+import retrofit2.http.PUT
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Multipart
@@ -27,13 +31,6 @@ interface SereneReadApi {
         @Path("booksId") bookId: Long
     ): BaseResponse<BookDto>
 
-    // 4. Update Read Progress
-    @PATCH("books/{booksId}/progress")
-    suspend fun updateProgress(
-        @Path("booksId") bookId: Long,
-        @Body request: UpdateProgressRequest
-    ): BaseResponse<Any> // Pakai Any karena kita hanya butuh status & message
-
     // Ambil URL PDF untuk membaca buku
     @GET("books/{booksId}/content")
     suspend fun getBookContent(
@@ -41,16 +38,34 @@ interface SereneReadApi {
     ): BaseResponse<BookDto>
     // Kita bisa memakai BookDto karena di dalamnya sudah ada wadah untuk "pdf_url"
     
-    @Multipart
+    // Body berupa multipart utuh (title, author, published_year, pdf_file) yang dibungkus
+    // ProgressRequestBody, supaya progres unggah bisa ditampilkan
     @POST("books")
     suspend fun uploadBook(
-        @Part("title") title: okhttp3.RequestBody,
-        @Part("author") author: okhttp3.RequestBody,
-        @Part("published_year") publishedYear: okhttp3.RequestBody,
-        @Part pdfFile: okhttp3.MultipartBody.Part
+        @Body body: okhttp3.RequestBody
+    ): BaseResponse<BookDto> // 201: data buku baru (thumbnail_url masih "" sampai sampul selesai dibuat)
+
+    // Ubah judul/penulis/tahun. 400 jika tidak valid, 403 jika bukan pemilik
+    @PATCH("books/{id}")
+    suspend fun updateBook(
+        @Path("id") bookId: Long,
+        @Body request: UpdateBookRequest
+    ): BaseResponse<BookDto>
+
+    // 403 jika bukan pemilik, 404 jika sudah terhapus
+    @DELETE("books/{id}")
+    suspend fun deleteBook(
+        @Path("id") bookId: Long
     ): BaseResponse<Any>
+
+    @PUT("books/{id}/favorite")
+    suspend fun setFavorite(
+        @Path("id") bookId: Long,
+        @Body request: FavoriteRequest
+    ): BaseResponse<BookDto>
     
     
+    // Update progres baca (Pakai Any karena kita hanya butuh status & message)
     @PATCH("books/{id}/progress")
     suspend fun updateReadingProgress(
         @Path("id") bookId: Long,

@@ -65,6 +65,10 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.lifecycle.livedata.ktx)
 
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+
     // Room Database
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
@@ -79,6 +83,12 @@ dependencies {
 
     // Coil Image Loader
     implementation(libs.coil)
+
+    // WorkManager
+    implementation(libs.androidx.work.runtime.ktx)
+
+    // Pull-to-refresh di Home
+    implementation(libs.androidx.swiperefreshlayout)
 
     // PDF Viewer
     implementation(libs.androidx.pdf.viewer)
