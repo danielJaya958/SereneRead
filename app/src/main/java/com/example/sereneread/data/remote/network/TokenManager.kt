@@ -28,6 +28,19 @@ class TokenManager @Inject constructor(
         prefs.edit().remove("JWT_TOKEN").apply()
     }
     
+    // Email akun yang terakhir login, untuk mendeteksi pergantian akun
+    fun saveAccount(email: String) {
+        prefs.edit().putString("ACCOUNT_EMAIL", email).apply()
+    }
+
+    fun getAccount(): String? {
+        return prefs.getString("ACCOUNT_EMAIL", null)
+    }
+
+    fun clearAccount() {
+        prefs.edit().remove("ACCOUNT_EMAIL").apply()
+    }
+
     fun triggerSessionExpired() {
         clearToken() // Hapus token yang sudah basi
         _sessionExpiredEvent.tryEmit(Unit) // Bunyikan alarm!
